@@ -2,9 +2,9 @@
 .idea/
 .kotlin/
 .superpowers/
+.worktrees/
 **/build/
 local.properties
 *.iml
 *.jks
 *.keystore
-
