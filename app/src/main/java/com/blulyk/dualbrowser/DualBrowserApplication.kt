@@ -9,6 +9,7 @@ import com.blulyk.dualbrowser.domain.BrowserSessionManager
 import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.domain.BrowserTab
 import com.blulyk.dualbrowser.ui.EngineActionBus
+import com.blulyk.dualbrowser.ui.TabPreviewStore
 import com.blulyk.dualbrowser.platform.SecondaryDisplayTracker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 class DualBrowserApplication : Application() {
     val sessionManager by lazy { BrowserSessionManager() }
     val engineActionBus by lazy { EngineActionBus() }
+    val tabPreviewStore by lazy { TabPreviewStore() }
     val secondaryDisplayTracker by lazy { SecondaryDisplayTracker() }
     lateinit var repository: BrowserRepository
         private set

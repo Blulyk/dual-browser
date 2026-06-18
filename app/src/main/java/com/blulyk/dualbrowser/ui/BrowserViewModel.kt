@@ -1,5 +1,6 @@
 package com.blulyk.dualbrowser.ui
 
+import android.graphics.Bitmap
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.CreationExtras
@@ -11,11 +12,20 @@ import com.blulyk.dualbrowser.platform.ControllerAction
 class BrowserViewModel(
     private val sessionManager: BrowserSessionManager = BrowserSessionManager(),
     private val engineActionBus: EngineActionBus = EngineActionBus(),
+    private val previewStore: TabPreviewStore = TabPreviewStore(),
 ) : ViewModel() {
     val state = sessionManager.state
     val engineActions = engineActionBus.actions
+    val previews = previewStore.previews
 
-    fun dispatch(command: BrowserCommand) = sessionManager.dispatch(command)
+    fun dispatch(command: BrowserCommand) {
+        sessionManager.dispatch(command)
+        previewStore.retain(sessionManager.state.value.tabs.mapTo(mutableSetOf()) { it.id })
+    }
+
+    fun updatePreview(tabId: String, bitmap: Bitmap) {
+        if (state.value.tabs.any { it.id == tabId }) previewStore.put(tabId, bitmap)
+    }
 
     fun dispatchEngine(action: EngineAction) {
         engineActionBus.dispatch(action)
@@ -42,7 +52,11 @@ class BrowserViewModel(
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
             require(modelClass.isAssignableFrom(BrowserViewModel::class.java))
-            return BrowserViewModel(application.sessionManager, application.engineActionBus) as T
+            return BrowserViewModel(
+                application.sessionManager,
+                application.engineActionBus,
+                application.tabPreviewStore,
+            ) as T
         }
     }
 }
