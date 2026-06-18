@@ -4,32 +4,31 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.blulyk.dualbrowser.DualBrowserApplication
-import com.blulyk.dualbrowser.platform.AndroidDisplayCoordinator
 
-class MainActivity : ComponentActivity() {
+class SecondaryDisplayActivity : ComponentActivity() {
     private val viewModel by viewModels<BrowserViewModel> {
         BrowserViewModel.Factory(application as DualBrowserApplication)
     }
-    private lateinit var displayCoordinator: AndroidDisplayCoordinator
-    private var dualDisplayActive by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        displayCoordinator = AndroidDisplayCoordinator(this)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
             MaterialTheme {
-                if (dualDisplayActive) {
-                    WebSurface(state.focusedTab, viewModel.engineActions)
+                val lowerTabId = state.lowerTabId
+                if (lowerTabId == null) {
+                    ControlCenter(
+                        state = state,
+                        onCommand = viewModel::dispatch,
+                        onEngineAction = viewModel::dispatchEngine,
+                    )
                 } else {
                     BrowserApp(
-                        state = state,
+                        state = state.copy(focusedTabId = lowerTabId),
                         onCommand = viewModel::dispatch,
                         engineActions = viewModel.engineActions,
                         onEngineAction = viewModel::dispatchEngine,
@@ -38,16 +37,5 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onStart() {
-        super.onStart()
-        displayCoordinator.start { assignment ->
-            dualDisplayActive = displayCoordinator.launchLowerIfNeeded(assignment)
-        }
-    }
-
-    override fun onStop() {
-        displayCoordinator.stop()
-        super.onStop()
-    }
 }
+

@@ -1,23 +1,33 @@
 package com.blulyk.dualbrowser.ui
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import com.blulyk.dualbrowser.DualBrowserApplication
 import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.domain.BrowserSessionManager
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 
 class BrowserViewModel(
     private val sessionManager: BrowserSessionManager = BrowserSessionManager(),
+    private val engineActionBus: EngineActionBus = EngineActionBus(),
 ) : ViewModel() {
     val state = sessionManager.state
-
-    private val mutableEngineActions = MutableSharedFlow<EngineAction>(extraBufferCapacity = 16)
-    val engineActions = mutableEngineActions.asSharedFlow()
+    val engineActions = engineActionBus.actions
 
     fun dispatch(command: BrowserCommand) = sessionManager.dispatch(command)
 
     fun dispatchEngine(action: EngineAction) {
-        mutableEngineActions.tryEmit(action)
+        engineActionBus.dispatch(action)
+    }
+
+    class Factory(
+        private val application: DualBrowserApplication,
+    ) : ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+            require(modelClass.isAssignableFrom(BrowserViewModel::class.java))
+            return BrowserViewModel(application.sessionManager, application.engineActionBus) as T
+        }
     }
 }
 

@@ -57,6 +57,18 @@ fun ControlCenter(
                 BrowserControl("Back", "back") { onEngineAction(EngineAction.Back) }
                 BrowserControl("Forward", "forward") { onEngineAction(EngineAction.Forward) }
                 BrowserControl("Reload", "reload") { onEngineAction(EngineAction.Reload) }
+                BrowserControl(
+                    label = if (state.lowerTabId == null) "Dual view" else "Controls",
+                    tag = "dual-view",
+                ) {
+                    onCommand(
+                        if (state.lowerTabId == null) {
+                            BrowserCommand.PromoteToLower(state.focusedTabId)
+                        } else {
+                            BrowserCommand.ClearLower
+                        },
+                    )
+                }
             }
             Row {
                 OutlinedTextField(

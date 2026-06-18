@@ -88,4 +88,14 @@ class ControlCenterTest {
 
         assertEquals(BrowserCommand.NewTab(isPrivate = true), commands.single())
     }
+
+    @Test
+    fun dualViewButtonPromotesFocusedTab() {
+        val commands = mutableListOf<BrowserCommand>()
+        composeRule.setContent { ControlCenter(state = state, onCommand = commands::add) }
+
+        composeRule.onNodeWithTag("dual-view").performClick()
+
+        assertEquals(BrowserCommand.PromoteToLower(tab.id), commands.single())
+    }
 }
