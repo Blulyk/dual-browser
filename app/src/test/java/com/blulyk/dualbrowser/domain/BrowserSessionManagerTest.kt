@@ -55,5 +55,24 @@ class BrowserSessionManagerTest {
         assertTrue(manager.state.value.tab(firstTab.id).needsRecovery)
         assertFalse(manager.state.value.tab(secondId).needsRecovery)
     }
-}
 
+    @Test
+    fun restoredSessionReplacesDefaultState() {
+        val restored = listOf(
+            BrowserTab("restored-1", "https://one.example"),
+            BrowserTab("restored-2", "https://two.example"),
+        )
+
+        manager.dispatch(
+            BrowserCommand.Restore(
+                tabs = restored,
+                focusedTabId = "restored-2",
+                lowerTabId = "restored-1",
+            ),
+        )
+
+        assertEquals(restored, manager.state.value.tabs)
+        assertEquals("restored-2", manager.state.value.focusedTabId)
+        assertEquals("restored-1", manager.state.value.lowerTabId)
+    }
+}

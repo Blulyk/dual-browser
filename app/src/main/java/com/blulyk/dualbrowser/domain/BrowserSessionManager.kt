@@ -34,6 +34,17 @@ class BrowserSessionManager(
         is BrowserCommand.RendererGone -> current.updateTab(command.tabId) {
             it.copy(needsRecovery = true)
         }
+        is BrowserCommand.Restore -> restore(command)
+    }
+
+    private fun restore(command: BrowserCommand.Restore): BrowserState {
+        require(command.tabs.isNotEmpty()) { "A restored session must contain a tab" }
+        val ids = command.tabs.mapTo(mutableSetOf(), BrowserTab::id)
+        require(command.focusedTabId in ids) { "Focused tab is not part of the restored session" }
+        require(command.lowerTabId == null || command.lowerTabId in ids) {
+            "Lower tab is not part of the restored session"
+        }
+        return BrowserState(command.tabs, command.focusedTabId, command.lowerTabId)
     }
 
     private fun closeTab(current: BrowserState, tabId: String): BrowserState {
@@ -62,4 +73,3 @@ class BrowserSessionManager(
         }
     }
 }
-

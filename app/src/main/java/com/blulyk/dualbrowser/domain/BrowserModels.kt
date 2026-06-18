@@ -29,5 +29,9 @@ sealed interface BrowserCommand {
     data class PromoteToLower(val tabId: String) : BrowserCommand
     data object ClearLower : BrowserCommand
     data class RendererGone(val tabId: String) : BrowserCommand
+    data class Restore(
+        val tabs: List<BrowserTab>,
+        val focusedTabId: String,
+        val lowerTabId: String?,
+    ) : BrowserCommand
 }
-
