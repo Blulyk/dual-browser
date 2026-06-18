@@ -72,6 +72,10 @@ class WebViewFactory {
             callbacks.onPageFinished(url)
         }
 
+        override fun onPageCommitVisible(view: WebView, url: String) {
+            callbacks.onPageCommitVisible(url)
+        }
+
         override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
             handler.cancel()
         }

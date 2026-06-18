@@ -11,6 +11,7 @@ import com.blulyk.dualbrowser.platform.DownloadSpec
 interface WebViewCallbacks {
     fun onPageStarted(url: String) = Unit
     fun onPageFinished(url: String) = Unit
+    fun onPageCommitVisible(url: String) = Unit
     fun onTitleChanged(title: String) = Unit
     fun onProgressChanged(progress: Int) = Unit
     fun onRendererGone() = Unit

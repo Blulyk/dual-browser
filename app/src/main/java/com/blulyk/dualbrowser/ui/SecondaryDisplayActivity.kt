@@ -37,6 +37,7 @@ class SecondaryDisplayActivity : ComponentActivity() {
                         onCommand = viewModel::dispatch,
                         engineActions = viewModel.engineActions,
                         onEngineAction = viewModel::dispatchEngine,
+                        onPreviewCaptured = viewModel::updatePreview,
                     )
                 }
             }

@@ -48,5 +48,27 @@ class WebViewFactoryTest {
 
         assertEquals("https://example.com", engine.view.url)
     }
+
+    @Test
+    fun visibleCommitIsForwardedToCallbacks() {
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        var committedUrl: String? = null
+        val committedEngine = WebViewFactory().create(
+            context,
+            object : WebViewCallbacks {
+                override fun onPageCommitVisible(url: String) {
+                    committedUrl = url
+                }
+            },
+        )
+
+        committedEngine.view.webViewClient.onPageCommitVisible(
+            committedEngine.view,
+            "https://example.com",
+        )
+
+        assertEquals("https://example.com", committedUrl)
+        committedEngine.destroy()
+    }
 }
 

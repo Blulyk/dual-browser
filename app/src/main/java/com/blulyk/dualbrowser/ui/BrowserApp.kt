@@ -18,6 +18,7 @@ fun BrowserApp(
     onCommand: (BrowserCommand) -> Unit,
     engineActions: Flow<EngineAction> = emptyFlow(),
     onEngineAction: (EngineAction) -> Unit = {},
+    onPreviewCaptured: (String, android.graphics.Bitmap) -> Unit = { _, _ -> },
     webContent: @Composable (BrowserTab) -> Unit = {
         WebSurface(
             tab = it,
@@ -29,6 +30,7 @@ fun BrowserApp(
             onPopupRequested = { url ->
                 onCommand(BrowserCommand.OpenTab(url, isPrivate = it.isPrivate))
             },
+            onPreviewCaptured = onPreviewCaptured,
         )
     },
 ) {

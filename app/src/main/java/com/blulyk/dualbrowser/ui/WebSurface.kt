@@ -2,6 +2,8 @@ package com.blulyk.dualbrowser.ui
 
 import android.net.Uri
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.PermissionRequest
@@ -35,6 +37,7 @@ import com.blulyk.dualbrowser.platform.ExternalIntentHandler
 import com.blulyk.dualbrowser.platform.ExternalResult
 import com.blulyk.dualbrowser.platform.WebPermissionPolicy
 import kotlinx.coroutines.flow.Flow
+import kotlin.math.roundToInt
 
 @Composable
 fun WebSurface(
@@ -44,6 +47,8 @@ fun WebSurface(
     onRendererGone: () -> Unit = {},
     onPageFinished: (url: String, title: String) -> Unit = { _, _ -> },
     onPopupRequested: (url: String) -> Unit = {},
+    onPreviewCaptured: (String, Bitmap) -> Unit = { _, _ -> },
+    previewCapture: (View) -> Bitmap? = ::captureWebViewPreview,
     engineFactory: (Context, WebViewCallbacks) -> WebViewBrowserEngine = { context, callbacks ->
         WebViewFactory().create(context, callbacks)
     },
@@ -98,6 +103,15 @@ fun WebSurface(
 
             override fun onPageFinished(url: String) {
                 onPageFinished(url, latestTitle)
+            }
+
+            override fun onPageCommitVisible(url: String) {
+                val view = engine?.view ?: return
+                view.post {
+                    previewCapture(view)?.let { bitmap ->
+                        onPreviewCaptured(tab.id, bitmap)
+                    }
+                }
             }
 
             override fun shouldOverrideUrl(uri: Uri): Boolean = when (val result = externalIntents.open(uri)) {
@@ -218,5 +232,17 @@ fun WebSurface(
             geolocationRequest?.let { (origin, callback) -> callback.invoke(origin, false, false) }
             hideCustomView()
         }
+    }
+}
+
+internal fun captureWebViewPreview(view: View, maxWidth: Int = 480): Bitmap? {
+    if (view.width <= 0 || view.height <= 0) return null
+    val width = minOf(view.width, maxWidth)
+    val scale = width.toFloat() / view.width.toFloat()
+    val height = (view.height * scale).roundToInt().coerceAtLeast(1)
+    return Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888).also { bitmap ->
+        val canvas = Canvas(bitmap)
+        canvas.scale(scale, scale)
+        view.draw(canvas)
     }
 }

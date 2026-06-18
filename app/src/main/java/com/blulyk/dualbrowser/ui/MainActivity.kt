@@ -57,6 +57,7 @@ class MainActivity : ComponentActivity() {
                                     ),
                                 )
                             },
+                            onPreviewCaptured = viewModel::updatePreview,
                         )
                     }
                 } else {
@@ -65,6 +66,7 @@ class MainActivity : ComponentActivity() {
                         onCommand = viewModel::dispatch,
                         engineActions = viewModel.engineActions,
                         onEngineAction = viewModel::dispatchEngine,
+                        onPreviewCaptured = viewModel::updatePreview,
                     )
                 }
             }
