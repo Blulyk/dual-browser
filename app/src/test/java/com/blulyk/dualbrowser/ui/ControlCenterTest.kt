@@ -1,11 +1,16 @@
 package com.blulyk.dualbrowser.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.domain.BrowserState
 import com.blulyk.dualbrowser.domain.BrowserTab
@@ -34,6 +39,32 @@ class ControlCenterTest {
         composeRule.onNodeWithTag("address").performImeAction()
 
         assertEquals(BrowserCommand.Navigate(tab.id, "example.com"), commands.single())
+    }
+
+    @Test
+    fun goButtonNavigatesFromGoogleNewTab() {
+        val googleTab = BrowserTab(id = "tab-google", url = "https://www.google.com/")
+        val googleState = BrowserState(listOf(googleTab), googleTab.id)
+        val commands = mutableListOf<BrowserCommand>()
+        composeRule.setContent { ControlCenter(state = googleState, onCommand = commands::add) }
+
+        composeRule.onNodeWithTag("address").performTextClearance()
+        composeRule.onNodeWithTag("address").performTextInput("dual browser")
+        composeRule.onNodeWithTag("go").performClick()
+
+        assertEquals(BrowserCommand.Navigate(googleTab.id, "dual browser"), commands.single())
+    }
+
+    @Test
+    fun addressUpdatesWhenFocusedPageUrlChanges() {
+        var currentState by mutableStateOf(state)
+        composeRule.setContent { ControlCenter(state = currentState, onCommand = {}) }
+
+        currentState = state.copy(
+            tabs = listOf(tab.copy(url = "https://example.com/result")),
+        )
+
+        composeRule.onNodeWithTag("address").assertTextEquals("https://example.com/result")
     }
 
     @Test

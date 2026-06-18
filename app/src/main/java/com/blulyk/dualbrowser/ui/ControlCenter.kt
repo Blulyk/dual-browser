@@ -45,10 +45,14 @@ fun ControlCenter(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var address by rememberSaveable(state.focusedTabId) {
+    var address by rememberSaveable(state.focusedTabId, state.focusedTab.url) {
         mutableStateOf(state.focusedTab.url.takeUnless { it == "about:blank" }.orEmpty())
     }
-    val navigate = { onCommand(BrowserCommand.Navigate(state.focusedTabId, address)) }
+    val navigate = {
+        if (address.isNotBlank()) {
+            onCommand(BrowserCommand.Navigate(state.focusedTabId, address))
+        }
+    }
 
     Surface(
         modifier = modifier
@@ -107,6 +111,14 @@ fun ControlCenter(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Go),
                     keyboardActions = KeyboardActions(onGo = { navigate() }),
                 )
+                Button(
+                    onClick = navigate,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .testTag("go"),
+                ) {
+                    Text("Go")
+                }
                 Button(
                     onClick = { onCommand(BrowserCommand.NewTab(isPrivate = false)) },
                     modifier = Modifier
