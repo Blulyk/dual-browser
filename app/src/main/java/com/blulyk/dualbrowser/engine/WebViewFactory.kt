@@ -2,8 +2,11 @@ package com.blulyk.dualbrowser.engine
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.net.http.SslError
+import android.view.View
 import android.webkit.CookieManager
+import android.webkit.PermissionRequest
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.SslErrorHandler
 import android.webkit.WebChromeClient
@@ -11,6 +14,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.webkit.ValueCallback
+import android.webkit.GeolocationPermissions
 
 class WebViewFactory {
     fun create(context: Context, callbacks: WebViewCallbacks): WebViewBrowserEngine {
@@ -22,6 +27,17 @@ class WebViewFactory {
         }
         webView.webViewClient = BrowserWebViewClient(callbacks)
         webView.webChromeClient = BrowserWebChromeClient(callbacks)
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimeType, _ ->
+            callbacks.onDownloadRequested(
+                com.blulyk.dualbrowser.platform.DownloadSpec(
+                    url = url,
+                    userAgent = userAgent,
+                    contentDisposition = contentDisposition,
+                    mimeType = mimeType,
+                    cookies = CookieManager.getInstance().getCookie(url),
+                ),
+            )
+        }
         return WebViewBrowserEngine(webView)
     }
 
@@ -60,7 +76,8 @@ class WebViewFactory {
             return true
         }
 
-        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean = false
+        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean =
+            callbacks.shouldOverrideUrl(request.url)
     }
 
     private class BrowserWebChromeClient(
@@ -72,6 +89,31 @@ class WebViewFactory {
 
         override fun onProgressChanged(view: WebView, newProgress: Int) {
             callbacks.onProgressChanged(newProgress)
+        }
+
+        override fun onShowFileChooser(
+            webView: WebView,
+            filePathCallback: ValueCallback<Array<Uri>>,
+            fileChooserParams: FileChooserParams,
+        ): Boolean = callbacks.onShowFileChooser(filePathCallback, fileChooserParams)
+
+        override fun onPermissionRequest(request: PermissionRequest) {
+            callbacks.onPermissionRequest(request)
+        }
+
+        override fun onShowCustomView(view: View, callback: CustomViewCallback) {
+            callbacks.onShowCustomView(view, callback)
+        }
+
+        override fun onHideCustomView() {
+            callbacks.onHideCustomView()
+        }
+
+        override fun onGeolocationPermissionsShowPrompt(
+            origin: String,
+            callback: GeolocationPermissions.Callback,
+        ) {
+            callbacks.onGeolocationPermissionsShowPrompt(origin, callback)
         }
     }
 }

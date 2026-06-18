@@ -18,7 +18,13 @@ fun BrowserApp(
     onCommand: (BrowserCommand) -> Unit,
     engineActions: Flow<EngineAction> = emptyFlow(),
     onEngineAction: (EngineAction) -> Unit = {},
-    webContent: @Composable (BrowserTab) -> Unit = { WebSurface(it, engineActions) },
+    webContent: @Composable (BrowserTab) -> Unit = {
+        WebSurface(
+            tab = it,
+            engineActions = engineActions,
+            onRendererGone = { onCommand(BrowserCommand.RendererGone(it.id)) },
+        )
+    },
 ) {
     Column(Modifier.fillMaxSize()) {
         Box(

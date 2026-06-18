@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.blulyk.dualbrowser.DualBrowserApplication
+import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.platform.AndroidDisplayCoordinator
 
 class MainActivity : ComponentActivity() {
@@ -26,7 +27,13 @@ class MainActivity : ComponentActivity() {
             val state by viewModel.state.collectAsStateWithLifecycle()
             MaterialTheme {
                 if (dualDisplayActive) {
-                    WebSurface(state.focusedTab, viewModel.engineActions)
+                    WebSurface(
+                        tab = state.focusedTab,
+                        engineActions = viewModel.engineActions,
+                        onRendererGone = {
+                            viewModel.dispatch(BrowserCommand.RendererGone(state.focusedTabId))
+                        },
+                    )
                 } else {
                     BrowserApp(
                         state = state,
