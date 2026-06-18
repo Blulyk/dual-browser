@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -26,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
@@ -45,6 +47,12 @@ fun TabPreviewCarousel(
     onCommand: (BrowserCommand) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberLazyListState()
+    LaunchedEffect(state.focusedTabId, state.tabs.size) {
+        val focusedIndex = state.tabs.indexOfFirst { it.id == state.focusedTabId }
+        if (focusedIndex >= 0) listState.animateScrollToItem(focusedIndex)
+    }
+
     Column(modifier.fillMaxWidth().testTag("tab-preview-carousel")) {
         Text(
             "Tabs",
@@ -53,6 +61,7 @@ fun TabPreviewCarousel(
             fontWeight = FontWeight.SemiBold,
         )
         LazyRow(
+            state = listState,
             modifier = Modifier.fillMaxWidth().testTag("tab-preview-list"),
             contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 14.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),

@@ -1,5 +1,10 @@
 package com.blulyk.dualbrowser.ui
 
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -41,5 +46,38 @@ class TabPreviewCarouselTest {
             listOf(BrowserCommand.Focus("two"), BrowserCommand.Close("two")),
             commands,
         )
+    }
+
+    @Test
+    fun browserPanelProvidesReadableContentColor() {
+        var contentColor: Color? = null
+        composeRule.setContent {
+            DualBrowserTheme {
+                BrowserPanel {
+                    contentColor = LocalContentColor.current
+                }
+            }
+        }
+        composeRule.waitForIdle()
+
+        assertEquals(DualBrowserColors.text, contentColor)
+    }
+
+    @Test
+    fun newlyFocusedTabScrollsIntoView() {
+        val tabs = (1..4).map { index ->
+            BrowserTab("tab-$index", "https://$index.example", "Tab $index")
+        }
+        var state by mutableStateOf(BrowserState(tabs, tabs.first().id))
+        composeRule.setContent {
+            DualBrowserTheme {
+                TabPreviewCarousel(state, emptyMap(), {})
+            }
+        }
+
+        state = state.copy(focusedTabId = tabs.last().id)
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithTag("tab-preview-${tabs.last().id}").assertIsDisplayed()
     }
 }

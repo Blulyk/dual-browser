@@ -14,8 +14,17 @@ Record the diagnostics report and WebView version with every test run.
 
 - [ ] Address entry resolves hosts and search terms correctly.
 - [ ] Back, forward, reload, new tab, close tab, and private tab work by touch.
+- [ ] Creating or focusing a tab scrolls its preview fully into view.
 - [ ] B navigates back; L1 and R1 switch tabs.
 - [ ] D-pad focus and A activation work through standard Android focus navigation.
+
+## Lower-Screen Browser UI
+
+- [ ] The 1240 x 1080 lower capture uses the navy palette with readable text and no clipped primary controls.
+- [ ] Every loaded tab shows a real page thumbnail; private thumbnails remain memory-only.
+- [ ] Tapping a thumbnail focuses that tab and its close button removes only that tab.
+- [ ] The bookmark bar remains visible below the tab carousel.
+- [ ] Tapping a bookmark navigates the focused tab without opening another tab.
 
 ## Web Compatibility
 
