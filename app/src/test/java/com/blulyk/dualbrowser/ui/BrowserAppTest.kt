@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onAllNodesWithTag
 import com.blulyk.dualbrowser.domain.BrowserState
 import com.blulyk.dualbrowser.domain.BrowserTab
 import org.junit.Rule
@@ -36,5 +38,26 @@ class BrowserAppTest {
 
         composeRule.onNodeWithTag("fake-web").assertIsDisplayed()
         composeRule.onNodeWithTag("control-center").assertIsDisplayed()
+    }
+
+    @Test
+    fun rendererFailureShowsRecoveryInsteadOfWebSurface() {
+        val tab = BrowserTab(
+            id = "tab-1",
+            url = "https://example.com",
+            needsRecovery = true,
+        )
+        val state = BrowserState(tabs = listOf(tab), focusedTabId = tab.id)
+
+        composeRule.setContent {
+            BrowserApp(
+                state = state,
+                onCommand = {},
+                webContent = { Box(Modifier.fillMaxSize().testTag("fake-web")) },
+            )
+        }
+
+        composeRule.onNodeWithTag("recovery").assertIsDisplayed()
+        composeRule.onAllNodesWithTag("fake-web").assertCountEquals(0)
     }
 }

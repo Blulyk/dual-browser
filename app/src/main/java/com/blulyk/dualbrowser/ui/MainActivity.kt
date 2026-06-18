@@ -30,13 +30,17 @@ class MainActivity : ComponentActivity() {
             val state by viewModel.state.collectAsStateWithLifecycle()
             MaterialTheme {
                 if (dualDisplayActive) {
-                    WebSurface(
-                        tab = state.focusedTab,
-                        engineActions = viewModel.engineActions,
-                        onRendererGone = {
-                            viewModel.dispatch(BrowserCommand.RendererGone(state.focusedTabId))
-                        },
-                    )
+                    if (state.focusedTab.needsRecovery) {
+                        RecoveryView(state.focusedTab, viewModel::dispatch)
+                    } else {
+                        WebSurface(
+                            tab = state.focusedTab,
+                            engineActions = viewModel.engineActions,
+                            onRendererGone = {
+                                viewModel.dispatch(BrowserCommand.RendererGone(state.focusedTabId))
+                            },
+                        )
+                    }
                 } else {
                     BrowserApp(
                         state = state,

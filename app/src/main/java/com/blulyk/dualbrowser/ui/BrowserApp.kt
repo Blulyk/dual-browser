@@ -32,7 +32,11 @@ fun BrowserApp(
                 .weight(1f)
                 .fillMaxWidth(),
         ) {
-            webContent(state.focusedTab)
+            if (state.focusedTab.needsRecovery) {
+                RecoveryView(state.focusedTab, onCommand)
+            } else {
+                webContent(state.focusedTab)
+            }
         }
         ControlCenter(
             state = state,
