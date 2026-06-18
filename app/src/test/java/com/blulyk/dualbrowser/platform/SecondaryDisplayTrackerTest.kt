@@ -7,14 +7,28 @@ class SecondaryDisplayTrackerTest {
     @Test
     fun reportsOnlyTheCurrentlyStartedSecondaryDisplay() {
         val tracker = SecondaryDisplayTracker()
+        val owner = Any()
 
-        tracker.started(displayId = 2)
+        tracker.started(owner, displayId = 2)
         assertEquals(2, tracker.activeDisplayId.value)
 
-        tracker.stopped(displayId = 3)
+        tracker.stopped(Any())
         assertEquals(2, tracker.activeDisplayId.value)
 
-        tracker.stopped(displayId = 2)
+        tracker.stopped(owner)
         assertEquals(null, tracker.activeDisplayId.value)
+    }
+
+    @Test
+    fun oldOwnerCannotClearNewOwnerOnSameDisplay() {
+        val tracker = SecondaryDisplayTracker()
+        val oldOwner = Any()
+        val newOwner = Any()
+
+        tracker.started(oldOwner, displayId = 2)
+        tracker.started(newOwner, displayId = 2)
+        tracker.stopped(oldOwner)
+
+        assertEquals(2, tracker.activeDisplayId.value)
     }
 }

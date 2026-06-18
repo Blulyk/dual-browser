@@ -5,15 +5,20 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class SecondaryDisplayTracker {
+    private data class ActiveDisplay(val owner: Any, val displayId: Int)
+
+    private var activeDisplay: ActiveDisplay? = null
     private val mutableActiveDisplayId = MutableStateFlow<Int?>(null)
     val activeDisplayId: StateFlow<Int?> = mutableActiveDisplayId.asStateFlow()
 
-    fun started(displayId: Int) {
+    fun started(owner: Any, displayId: Int) {
+        activeDisplay = ActiveDisplay(owner, displayId)
         mutableActiveDisplayId.value = displayId
     }
 
-    fun stopped(displayId: Int) {
-        if (mutableActiveDisplayId.value == displayId) {
+    fun stopped(owner: Any) {
+        if (activeDisplay?.owner === owner) {
+            activeDisplay = null
             mutableActiveDisplayId.value = null
         }
     }

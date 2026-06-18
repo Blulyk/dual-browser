@@ -12,8 +12,13 @@ class DisplayCoordinator {
         )
     }
 
-    fun shouldLaunchLower(currentDisplayId: Int, assignment: DisplayAssignment): Boolean =
-        assignment.lowerId != null && currentDisplayId == assignment.upperId
+    fun shouldLaunchLower(
+        currentDisplayId: Int,
+        assignment: DisplayAssignment,
+        activeSecondaryDisplayId: Int?,
+    ): Boolean = assignment.lowerId != null &&
+        currentDisplayId == assignment.upperId &&
+        activeSecondaryDisplayId != assignment.lowerId
 
     fun isDualModeReady(
         assignment: DisplayAssignment,

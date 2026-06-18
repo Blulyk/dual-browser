@@ -51,8 +51,18 @@ class DisplayCoordinatorTest {
     fun onlyUpperActivityShouldLaunchLowerDisplay() {
         val assignment = DisplayAssignment(upperId = 0, lowerId = 2)
 
-        assertEquals(true, coordinator.shouldLaunchLower(currentDisplayId = 0, assignment))
-        assertEquals(false, coordinator.shouldLaunchLower(currentDisplayId = 2, assignment))
+        assertEquals(
+            true,
+            coordinator.shouldLaunchLower(0, assignment, activeSecondaryDisplayId = null),
+        )
+        assertEquals(
+            false,
+            coordinator.shouldLaunchLower(2, assignment, activeSecondaryDisplayId = null),
+        )
+        assertEquals(
+            false,
+            coordinator.shouldLaunchLower(0, assignment, activeSecondaryDisplayId = 2),
+        )
     }
 
 

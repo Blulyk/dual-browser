@@ -76,7 +76,9 @@ class MainActivity : ComponentActivity() {
         super.onStart()
         displayCoordinator.start { assignment ->
             displayAssignment = assignment
-            displayCoordinator.launchLowerIfNeeded(assignment)
+            val activeSecondaryDisplayId = (application as DualBrowserApplication)
+                .secondaryDisplayTracker.activeDisplayId.value
+            displayCoordinator.launchLowerIfNeeded(assignment, activeSecondaryDisplayId)
         }
     }
 

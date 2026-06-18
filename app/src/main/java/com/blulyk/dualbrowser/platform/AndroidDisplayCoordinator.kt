@@ -30,7 +30,10 @@ class AndroidDisplayCoordinator(
         displayManager.unregisterDisplayListener(this)
     }
 
-    fun launchLowerIfNeeded(assignment: DisplayAssignment): Boolean {
+    fun launchLowerIfNeeded(
+        assignment: DisplayAssignment,
+        activeSecondaryDisplayId: Int?,
+    ): Boolean {
         val currentDisplayId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             activity.display?.displayId ?: Display.DEFAULT_DISPLAY
         } else {
@@ -38,7 +41,9 @@ class AndroidDisplayCoordinator(
             activity.windowManager.defaultDisplay.displayId
         }
         val lowerId = assignment.lowerId ?: return false
-        if (!coordinator.shouldLaunchLower(currentDisplayId, assignment)) return false
+        if (!coordinator.shouldLaunchLower(currentDisplayId, assignment, activeSecondaryDisplayId)) {
+            return false
+        }
         return launchLowerActivity(lowerId)
     }
 

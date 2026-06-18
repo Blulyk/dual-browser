@@ -14,6 +14,7 @@ import android.os.Build
 import android.view.Display
 
 class SecondaryDisplayActivity : ComponentActivity() {
+    private val displayTrackerOwner = Any()
     private val controllerMapper = ControllerMapper()
     private val viewModel by viewModels<BrowserViewModel> {
         BrowserViewModel.Factory(application as DualBrowserApplication)
@@ -45,11 +46,14 @@ class SecondaryDisplayActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        (application as DualBrowserApplication).secondaryDisplayTracker.started(currentDisplayId())
+        (application as DualBrowserApplication).secondaryDisplayTracker.started(
+            displayTrackerOwner,
+            currentDisplayId(),
+        )
     }
 
     override fun onStop() {
-        (application as DualBrowserApplication).secondaryDisplayTracker.stopped(currentDisplayId())
+        (application as DualBrowserApplication).secondaryDisplayTracker.stopped(displayTrackerOwner)
         super.onStop()
     }
 
