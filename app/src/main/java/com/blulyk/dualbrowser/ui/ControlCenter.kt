@@ -1,6 +1,7 @@
 package com.blulyk.dualbrowser.ui
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -31,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.domain.BrowserState
 import com.blulyk.dualbrowser.domain.BrowserTab
+import com.blulyk.dualbrowser.DualBrowserApplication
+import kotlinx.coroutines.launch
 
 @Composable
 fun ControlCenter(
@@ -40,6 +44,7 @@ fun ControlCenter(
     onEngineAction: (EngineAction) -> Unit = {},
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     var address by rememberSaveable(state.focusedTabId) {
         mutableStateOf(state.focusedTab.url.takeUnless { it == "about:blank" }.orEmpty())
     }
@@ -78,6 +83,16 @@ fun ControlCenter(
                 }
                 BrowserControl("Diagnostics", "diagnostics") {
                     context.startActivity(Intent(context, DiagnosticsActivity::class.java))
+                }
+                BrowserControl("Bookmark", "bookmark") {
+                    val application = context.applicationContext as DualBrowserApplication
+                    scope.launch {
+                        application.repository.addBookmark(state.focusedTab)
+                        Toast.makeText(context, "Bookmark saved", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                BrowserControl("Library", "library") {
+                    context.startActivity(Intent(context, LibraryActivity::class.java))
                 }
             }
             Row {

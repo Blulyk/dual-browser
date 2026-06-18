@@ -75,4 +75,26 @@ class BrowserSessionManagerTest {
         assertEquals("restored-2", manager.state.value.focusedTabId)
         assertEquals("restored-1", manager.state.value.lowerTabId)
     }
+
+    @Test
+    fun pageMetadataUpdatesUrlAndTitle() {
+        manager.dispatch(
+            BrowserCommand.UpdatePage(
+                tabId = firstTab.id,
+                url = "https://example.com/redirected",
+                title = "Example",
+            ),
+        )
+
+        assertEquals("https://example.com/redirected", manager.state.value.focusedTab.url)
+        assertEquals("Example", manager.state.value.focusedTab.title)
+    }
+
+    @Test
+    fun openTabCreatesFocusedTabAtResolvedUrl() {
+        manager.dispatch(BrowserCommand.OpenTab("example.com", isPrivate = false))
+
+        assertEquals(2, manager.state.value.tabs.size)
+        assertEquals("https://example.com", manager.state.value.focusedTab.url)
+    }
 }

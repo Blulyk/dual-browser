@@ -23,6 +23,12 @@ fun BrowserApp(
             tab = it,
             engineActions = engineActions,
             onRendererGone = { onCommand(BrowserCommand.RendererGone(it.id)) },
+            onPageFinished = { url, title ->
+                onCommand(BrowserCommand.UpdatePage(it.id, url, title))
+            },
+            onPopupRequested = { url ->
+                onCommand(BrowserCommand.OpenTab(url, isPrivate = it.isPrivate))
+            },
         )
     },
 ) {

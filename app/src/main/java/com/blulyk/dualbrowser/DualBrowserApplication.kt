@@ -12,7 +12,7 @@ import com.blulyk.dualbrowser.ui.EngineActionBus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class DualBrowserApplication : Application() {
@@ -44,7 +44,16 @@ class DualBrowserApplication : Application() {
                     ),
                 )
             }
-            sessionManager.state.collectLatest { state ->
+            var knownUrls = sessionManager.state.value.tabs.associate { it.id to it.url }
+            sessionManager.state.collect { state ->
+                state.tabs.forEach { tab ->
+                    if (knownUrls[tab.id] != tab.url &&
+                        (tab.url.startsWith("https://") || tab.url.startsWith("http://"))
+                    ) {
+                        repository.recordVisit(tab)
+                    }
+                }
+                knownUrls = state.tabs.associate { it.id to it.url }
                 repository.saveSession(
                     tabs = state.tabs,
                     focusedTabId = state.focusedTabId,

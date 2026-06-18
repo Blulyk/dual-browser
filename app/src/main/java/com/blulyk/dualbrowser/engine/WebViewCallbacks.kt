@@ -23,6 +23,7 @@ interface WebViewCallbacks {
     fun onPermissionRequest(request: PermissionRequest) = request.deny()
     fun onShowCustomView(view: View, callback: WebChromeClient.CustomViewCallback) = callback.onCustomViewHidden()
     fun onHideCustomView() = Unit
+    fun onPopupRequested(url: String) = Unit
     fun onGeolocationPermissionsShowPrompt(
         origin: String,
         callback: GeolocationPermissions.Callback,

@@ -39,6 +39,19 @@ class MainActivity : ComponentActivity() {
                             onRendererGone = {
                                 viewModel.dispatch(BrowserCommand.RendererGone(state.focusedTabId))
                             },
+                            onPageFinished = { url, title ->
+                                viewModel.dispatch(
+                                    BrowserCommand.UpdatePage(state.focusedTabId, url, title),
+                                )
+                            },
+                            onPopupRequested = { url ->
+                                viewModel.dispatch(
+                                    BrowserCommand.OpenTab(
+                                        input = url,
+                                        isPrivate = state.focusedTab.isPrivate,
+                                    ),
+                                )
+                            },
                         )
                     }
                 } else {

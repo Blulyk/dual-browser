@@ -17,6 +17,9 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.ValueCallback
 import android.webkit.GeolocationPermissions
+import android.os.Message
+import com.blulyk.dualbrowser.platform.PopupDecision
+import com.blulyk.dualbrowser.platform.PopupPolicy
 
 class WebViewFactory {
     fun create(context: Context, callbacks: WebViewCallbacks): WebViewBrowserEngine {
@@ -116,6 +119,29 @@ class WebViewFactory {
             callback: GeolocationPermissions.Callback,
         ) {
             callbacks.onGeolocationPermissionsShowPrompt(origin, callback)
+        }
+
+        override fun onCreateWindow(
+            view: WebView,
+            isDialog: Boolean,
+            isUserGesture: Boolean,
+            resultMsg: Message,
+        ): Boolean {
+            if (PopupPolicy.decide(isUserGesture) == PopupDecision.Reject) return false
+            val popup = WebView(view.context)
+            popup.webViewClient = object : WebViewClient() {
+                override fun shouldOverrideUrlLoading(
+                    popupView: WebView,
+                    request: WebResourceRequest,
+                ): Boolean {
+                    callbacks.onPopupRequested(request.url.toString())
+                    popupView.destroy()
+                    return true
+                }
+            }
+            (resultMsg.obj as WebView.WebViewTransport).webView = popup
+            resultMsg.sendToTarget()
+            return true
         }
     }
 }

@@ -24,11 +24,17 @@ data class BrowserState(
 sealed interface BrowserCommand {
     data class Navigate(val tabId: String, val input: String) : BrowserCommand
     data class NewTab(val isPrivate: Boolean) : BrowserCommand
+    data class OpenTab(val input: String, val isPrivate: Boolean) : BrowserCommand
     data class Close(val tabId: String) : BrowserCommand
     data class Focus(val tabId: String) : BrowserCommand
     data class PromoteToLower(val tabId: String) : BrowserCommand
     data object ClearLower : BrowserCommand
     data class RendererGone(val tabId: String) : BrowserCommand
+    data class UpdatePage(
+        val tabId: String,
+        val url: String,
+        val title: String,
+    ) : BrowserCommand
     data class Restore(
         val tabs: List<BrowserTab>,
         val focusedTabId: String,

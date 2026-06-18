@@ -40,6 +40,8 @@ fun WebSurface(
     engineActions: Flow<EngineAction>,
     modifier: Modifier = Modifier,
     onRendererGone: () -> Unit = {},
+    onPageFinished: (url: String, title: String) -> Unit = { _, _ -> },
+    onPopupRequested: (url: String) -> Unit = {},
 ) {
     val context = LocalContext.current
     var engine by remember(tab.id) { mutableStateOf<WebViewBrowserEngine?>(null) }
@@ -83,7 +85,16 @@ fun WebSurface(
     val callbacks = remember(tab.id, context) {
         val externalIntents = ExternalIntentHandler(context)
         val downloads = DownloadHandler(context)
+        var latestTitle = tab.title
         object : WebViewCallbacks {
+            override fun onTitleChanged(title: String) {
+                latestTitle = title
+            }
+
+            override fun onPageFinished(url: String) {
+                onPageFinished(url, latestTitle)
+            }
+
             override fun shouldOverrideUrl(uri: Uri): Boolean = when (val result = externalIntents.open(uri)) {
                 ExternalResult.NotExternal -> false
                 ExternalResult.Opened -> true
@@ -149,6 +160,8 @@ fun WebSurface(
             }
 
             override fun onRendererGone() = onRendererGone()
+
+            override fun onPopupRequested(url: String) = onPopupRequested(url)
         }
     }
 

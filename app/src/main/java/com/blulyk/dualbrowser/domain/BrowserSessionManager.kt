@@ -27,12 +27,23 @@ class BrowserSessionManager(
             val tab = BrowserTab(id = idGenerator(), url = "about:blank", isPrivate = command.isPrivate)
             current.copy(tabs = current.tabs + tab, focusedTabId = tab.id)
         }
+        is BrowserCommand.OpenTab -> {
+            val tab = BrowserTab(
+                id = idGenerator(),
+                url = resolver.resolve(command.input),
+                isPrivate = command.isPrivate,
+            )
+            current.copy(tabs = current.tabs + tab, focusedTabId = tab.id)
+        }
         is BrowserCommand.Close -> closeTab(current, command.tabId)
         is BrowserCommand.Focus -> current.copy(focusedTabId = current.tab(command.tabId).id)
         is BrowserCommand.PromoteToLower -> current.copy(lowerTabId = current.tab(command.tabId).id)
         BrowserCommand.ClearLower -> current.copy(lowerTabId = null)
         is BrowserCommand.RendererGone -> current.updateTab(command.tabId) {
             it.copy(needsRecovery = true)
+        }
+        is BrowserCommand.UpdatePage -> current.updateTab(command.tabId) {
+            it.copy(url = command.url, title = command.title.ifBlank { it.title })
         }
         is BrowserCommand.Restore -> restore(command)
     }

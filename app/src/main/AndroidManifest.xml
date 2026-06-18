@@ -22,6 +22,9 @@
             android:name=".ui.DiagnosticsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.LibraryActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.SecondaryDisplayActivity"
             android:excludeFromRecents="true"
             android:exported="false"
