@@ -28,6 +28,8 @@ class MainActivity : ComponentActivity() {
         displayCoordinator = AndroidDisplayCoordinator(this)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
+            val previews by viewModel.previews.collectAsStateWithLifecycle()
+            val bookmarks by viewModel.bookmarks.collectAsStateWithLifecycle(initialValue = emptyList())
             val activeSecondaryDisplayId by (application as DualBrowserApplication)
                 .secondaryDisplayTracker.activeDisplayId.collectAsStateWithLifecycle()
             val dualDisplayActive = displayAssignment?.let { assignment ->
@@ -67,6 +69,8 @@ class MainActivity : ComponentActivity() {
                         engineActions = viewModel.engineActions,
                         onEngineAction = viewModel::dispatchEngine,
                         onPreviewCaptured = viewModel::updatePreview,
+                        previews = previews,
+                        bookmarks = bookmarks,
                     )
                 }
             }

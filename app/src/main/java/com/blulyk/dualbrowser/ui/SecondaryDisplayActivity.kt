@@ -11,6 +11,8 @@ import com.blulyk.dualbrowser.DualBrowserApplication
 import com.blulyk.dualbrowser.platform.ControllerMapper
 import android.os.Build
 import android.view.Display
+import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxSize
 
 class SecondaryDisplayActivity : ComponentActivity() {
     private val displayTrackerOwner = Any()
@@ -23,6 +25,8 @@ class SecondaryDisplayActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
+            val previews by viewModel.previews.collectAsStateWithLifecycle()
+            val bookmarks by viewModel.bookmarks.collectAsStateWithLifecycle(initialValue = emptyList())
             DualBrowserTheme {
                 val lowerTabId = state.lowerTabId
                 if (lowerTabId == null) {
@@ -30,6 +34,9 @@ class SecondaryDisplayActivity : ComponentActivity() {
                         state = state,
                         onCommand = viewModel::dispatch,
                         onEngineAction = viewModel::dispatchEngine,
+                        previews = previews,
+                        bookmarks = bookmarks,
+                        modifier = Modifier.fillMaxSize(),
                     )
                 } else {
                     BrowserApp(
@@ -38,6 +45,8 @@ class SecondaryDisplayActivity : ComponentActivity() {
                         engineActions = viewModel.engineActions,
                         onEngineAction = viewModel::dispatchEngine,
                         onPreviewCaptured = viewModel::updatePreview,
+                        previews = previews,
+                        bookmarks = bookmarks,
                     )
                 }
             }

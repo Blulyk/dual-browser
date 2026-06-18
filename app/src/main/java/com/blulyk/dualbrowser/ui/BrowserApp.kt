@@ -4,11 +4,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.domain.BrowserState
 import com.blulyk.dualbrowser.domain.BrowserTab
+import com.blulyk.dualbrowser.data.BookmarkEntity
+import android.graphics.Bitmap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -19,6 +23,8 @@ fun BrowserApp(
     engineActions: Flow<EngineAction> = emptyFlow(),
     onEngineAction: (EngineAction) -> Unit = {},
     onPreviewCaptured: (String, android.graphics.Bitmap) -> Unit = { _, _ -> },
+    previews: Map<String, Bitmap> = emptyMap(),
+    bookmarks: List<BookmarkEntity> = emptyList(),
     webContent: @Composable (BrowserTab) -> Unit = {
         WebSurface(
             tab = it,
@@ -50,6 +56,9 @@ fun BrowserApp(
             state = state,
             onCommand = onCommand,
             onEngineAction = onEngineAction,
+            previews = previews,
+            bookmarks = bookmarks,
+            modifier = Modifier.fillMaxWidth().height(420.dp),
         )
     }
 }

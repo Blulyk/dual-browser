@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performScrollToIndex
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -73,6 +74,7 @@ class ControlCenterTest {
         composeRule.setContent { ControlCenter(state = state, onCommand = commands::add) }
 
         composeRule.onNodeWithTag("control-center").assertIsDisplayed()
+        composeRule.onNodeWithTag("browser-toolbar").assertIsDisplayed()
         composeRule.onNodeWithTag("new-tab").performClick()
 
         assertEquals(BrowserCommand.NewTab(isPrivate = false), commands.single())
@@ -105,7 +107,8 @@ class ControlCenterTest {
             )
         }
 
-        composeRule.onNodeWithTag("tab-tab-2").performClick()
+        composeRule.onNodeWithTag("tab-preview-list").performScrollToIndex(1)
+        composeRule.onNodeWithTag("tab-preview-tab-2").performClick()
 
         assertEquals(BrowserCommand.Focus(second.id), commands.single())
     }
