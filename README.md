@@ -13,14 +13,14 @@ Navegador Android local y basado en Chromium WebView, diseñado primero para la 
 
 ## Obtener la APK
 
-Descarga `dual-browser-v0.1.0-beta.1.apk` desde [GitHub Releases](../../releases). Comprueba que el SHA-256 coincida con el publicado en la release.
+Descarga `dual-browser-v0.1.0-beta.2.apk` desde [GitHub Releases](../../releases). Comprueba que el SHA-256 coincida con el publicado en la release.
 
 En Android, permite temporalmente instalar aplicaciones desconocidas para la app desde la que abras la APK. Instálala y vuelve a desactivar ese permiso si no lo necesitas.
 
 Con depuración USB también puedes instalarla así:
 
 ```powershell
-adb install -r dual-browser-v0.1.0-beta.1.apk
+adb install -r dual-browser-v0.1.0-beta.2.apk
 ```
 
 ## Compilar

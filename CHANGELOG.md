@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-beta.2 - 2026-06-18
+
+- Nuevo panel inferior azul marino con controles compactos de navegador.
+- Miniaturas visuales reales y desplazamiento automático a la pestaña activa.
+- Barra persistente de favoritos con navegación en la pestaña actual.
+- Reapertura estable desde cualquiera de las dos pantallas de la AYN Thor.
+- Recuperación fiable de la pantalla secundaria tras Home y suspensión.
+
 ## 0.1.0-beta.1 - 2026-06-18
 
 - Primera beta pública optimizada para AYN Thor.
