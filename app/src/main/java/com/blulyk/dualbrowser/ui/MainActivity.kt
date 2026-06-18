@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,7 +33,7 @@ class MainActivity : ComponentActivity() {
             val dualDisplayActive = displayAssignment?.let { assignment ->
                 displayCoordinator.isDualModeReady(assignment, activeSecondaryDisplayId)
             } == true
-            MaterialTheme {
+            DualBrowserTheme {
                 if (dualDisplayActive) {
                     if (state.focusedTab.needsRecovery) {
                         RecoveryView(state.focusedTab, viewModel::dispatch)

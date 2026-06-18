@@ -5,7 +5,6 @@ import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.blulyk.dualbrowser.DualBrowserApplication
@@ -24,7 +23,7 @@ class SecondaryDisplayActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
-            MaterialTheme {
+            DualBrowserTheme {
                 val lowerTabId = state.lowerTabId
                 if (lowerTabId == null) {
                     ControlCenter(
