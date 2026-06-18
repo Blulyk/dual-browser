@@ -74,4 +74,12 @@ class DisplayCoordinatorTest {
         assertEquals(false, coordinator.isDualModeReady(assignment, activeSecondaryDisplayId = 3))
         assertEquals(true, coordinator.isDualModeReady(assignment, activeSecondaryDisplayId = 2))
     }
+
+    @Test
+    fun primaryTaskIsRestoredOnlyWhenItMovesOffTheUpperDisplay() {
+        val assignment = DisplayAssignment(upperId = 0, lowerId = 4)
+
+        assertEquals(false, coordinator.shouldRestoreUpper(0, assignment))
+        assertEquals(true, coordinator.shouldRestoreUpper(4, assignment))
+    }
 }

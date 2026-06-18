@@ -24,4 +24,9 @@ class DisplayCoordinator {
         assignment: DisplayAssignment,
         activeSecondaryDisplayId: Int?,
     ): Boolean = assignment.lowerId != null && assignment.lowerId == activeSecondaryDisplayId
+
+    fun shouldRestoreUpper(
+        currentDisplayId: Int,
+        assignment: DisplayAssignment,
+    ): Boolean = currentDisplayId != assignment.upperId
 }

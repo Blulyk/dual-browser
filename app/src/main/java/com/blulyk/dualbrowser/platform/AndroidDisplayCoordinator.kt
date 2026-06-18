@@ -9,6 +9,7 @@ import android.view.Display
 import android.os.Build
 import android.util.Log
 import com.blulyk.dualbrowser.ui.SecondaryDisplayActivity
+import com.blulyk.dualbrowser.ui.MainActivity
 
 class AndroidDisplayCoordinator(
     private val activity: Activity,
@@ -34,17 +35,29 @@ class AndroidDisplayCoordinator(
         assignment: DisplayAssignment,
         activeSecondaryDisplayId: Int?,
     ): Boolean {
-        val currentDisplayId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            activity.display?.displayId ?: Display.DEFAULT_DISPLAY
-        } else {
-            @Suppress("DEPRECATION")
-            activity.windowManager.defaultDisplay.displayId
-        }
+        val currentDisplayId = currentDisplayId()
         val lowerId = assignment.lowerId ?: return false
         if (!coordinator.shouldLaunchLower(currentDisplayId, assignment, activeSecondaryDisplayId)) {
             return false
         }
         return launchLowerActivity(lowerId)
+    }
+
+    fun restoreUpperIfNeeded(assignment: DisplayAssignment): Boolean {
+        if (!coordinator.shouldRestoreUpper(currentDisplayId(), assignment)) return false
+        return runCatching {
+            val intent = Intent(activity, MainActivity::class.java).apply {
+                addFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP,
+                )
+            }
+            val options = ActivityOptions.makeBasic().setLaunchDisplayId(assignment.upperId)
+            activity.startActivity(intent, options.toBundle())
+        }.onFailure { error ->
+            Log.e(TAG, "Unable to restore primary activity to display ${assignment.upperId}", error)
+        }.isSuccess
     }
 
     fun isDualModeReady(
@@ -61,6 +74,13 @@ class AndroidDisplayCoordinator(
     }.onFailure { error ->
         Log.e(TAG, "Unable to launch secondary activity on display $displayId", error)
     }.isSuccess
+
+    private fun currentDisplayId(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        activity.display?.displayId ?: Display.DEFAULT_DISPLAY
+    } else {
+        @Suppress("DEPRECATION")
+        activity.windowManager.defaultDisplay.displayId
+    }
 
     override fun onDisplayAdded(displayId: Int) = notifyAssignment()
 

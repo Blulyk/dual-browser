@@ -26,15 +26,17 @@ fails because the manifest currently reports `LAUNCH_MULTIPLE`.
 primary task from display 0 to display 4 to honor the new launch display. The upper panel still
 returned to the launcher, so launch mode alone is insufficient.
 
-## Confirmed lifecycle change
+## Final lifecycle change
 
-Keep `MainActivity` as `singleTask`, remove the launcher intent filter from it, and add a no-history
-`LauncherActivity`. The launcher activity may start on either panel, but it immediately calculates
-the upper physical display, starts the unique `MainActivity` there with `ActivityOptions`, and
-finishes. This separates launcher placement from browser ownership while leaving the existing
-secondary activity and tracker unchanged.
+Keep `MainActivity` as the exported `MAIN/LAUNCHER` activity so Dual Browser remains a normal app
+in Android's app drawer. Keep it `singleTask` to prevent duplicate primary instances. If Android
+starts or moves that task onto the lower display, `AndroidDisplayCoordinator` immediately starts
+the same task on the assigned upper display with `ActivityOptions`; no intermediary launcher
+activity is used.
 
-Add a Robolectric test that verifies `LauncherActivity` starts `MainActivity` and finishes itself.
+The manifest test verifies that the launcher intent resolves directly to `MainActivity`. The
+display coordinator test verifies that restoration is requested only when the primary task is not
+on the assigned upper display.
 
 ## Home-to-app race found during replay
 
@@ -58,7 +60,7 @@ adb shell am force-stop com.blulyk.dualbrowser
 adb shell am start --display 0 -W -n com.blulyk.dualbrowser/.ui.MainActivity
 adb shell am start --display 4 -W -a android.intent.action.MAIN `
   -c android.intent.category.LAUNCHER `
-  -n com.blulyk.dualbrowser/.ui.LauncherActivity
+  -n com.blulyk.dualbrowser/.ui.MainActivity
 ```
 
 Then capture both physical panels and `dumpsys activity activities`. Passing requires exactly one

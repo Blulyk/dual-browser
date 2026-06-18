@@ -97,8 +97,7 @@ class MainActivity : ComponentActivity() {
         val tracker = (application as DualBrowserApplication).secondaryDisplayTracker
         secondaryLaunchReconciler.secondaryChanged(tracker.activeDisplayId.value)
         displayCoordinator.start { assignment ->
-            displayAssignment = assignment
-            secondaryLaunchReconciler.assignmentChanged(assignment)
+            reconcileDisplayAssignment(assignment)
         }
     }
 
@@ -114,5 +113,12 @@ class MainActivity : ComponentActivity() {
             return true
         }
         return super.onKeyDown(keyCode, event)
+    }
+
+    private fun reconcileDisplayAssignment(assignment: DisplayAssignment) {
+        displayAssignment = assignment
+        if (!displayCoordinator.restoreUpperIfNeeded(assignment)) {
+            secondaryLaunchReconciler.assignmentChanged(assignment)
+        }
     }
 }
