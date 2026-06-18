@@ -20,11 +20,15 @@ class BrowserSessionManager(
     fun restorableTabs(): List<BrowserTab> = state.value.tabs.filterNot(BrowserTab::isPrivate)
 
     private fun reduce(current: BrowserState, command: BrowserCommand): BrowserState = when (command) {
-        is BrowserCommand.Navigate -> current.updateTab(command.tabId) {
-            it.copy(url = resolver.resolve(command.input), needsRecovery = false)
+        is BrowserCommand.Navigate -> if (command.input.isBlank()) {
+            current
+        } else {
+            current.updateTab(command.tabId) {
+                it.copy(url = resolver.resolve(command.input), needsRecovery = false)
+            }
         }
         is BrowserCommand.NewTab -> {
-            val tab = BrowserTab(id = idGenerator(), url = "about:blank", isPrivate = command.isPrivate)
+            val tab = BrowserTab(id = idGenerator(), url = HOME_URL, isPrivate = command.isPrivate)
             current.copy(tabs = current.tabs + tab, focusedTabId = tab.id)
         }
         is BrowserCommand.OpenTab -> {
@@ -62,7 +66,7 @@ class BrowserSessionManager(
         current.tab(tabId)
         val remaining = current.tabs.filterNot { it.id == tabId }.toMutableList()
         if (remaining.isEmpty()) {
-            remaining += BrowserTab(id = idGenerator(), url = "about:blank")
+            remaining += BrowserTab(id = idGenerator(), url = HOME_URL)
         }
         val focusedId = if (current.focusedTabId == tabId) remaining.last().id else current.focusedTabId
         return current.copy(
@@ -78,8 +82,10 @@ class BrowserSessionManager(
     }
 
     companion object {
+        const val HOME_URL = "https://www.google.com/"
+
         private fun defaultState(): BrowserState {
-            val tab = BrowserTab(id = UUID.randomUUID().toString(), url = "about:blank")
+            val tab = BrowserTab(id = UUID.randomUUID().toString(), url = HOME_URL)
             return BrowserState(tabs = listOf(tab), focusedTabId = tab.id)
         }
     }

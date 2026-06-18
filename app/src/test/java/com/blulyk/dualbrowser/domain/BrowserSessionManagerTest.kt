@@ -21,6 +21,20 @@ class BrowserSessionManagerTest {
     }
 
     @Test
+    fun blankNavigationKeepsCurrentUrl() {
+        manager.dispatch(BrowserCommand.Navigate(firstTab.id, "   "))
+
+        assertEquals(firstTab.url, manager.state.value.focusedTab.url)
+    }
+
+    @Test
+    fun newNormalTabOpensGoogle() {
+        manager.dispatch(BrowserCommand.NewTab(isPrivate = false))
+
+        assertEquals(BrowserSessionManager.HOME_URL, manager.state.value.focusedTab.url)
+    }
+
+    @Test
     fun promotingTabAssignsLowerSurface() {
         manager.dispatch(BrowserCommand.PromoteToLower(firstTab.id))
 
@@ -35,6 +49,7 @@ class BrowserSessionManagerTest {
         assertNull(manager.state.value.lowerTabId)
         assertEquals(1, manager.state.value.tabs.size)
         assertFalse(manager.state.value.focusedTab.isPrivate)
+        assertEquals(BrowserSessionManager.HOME_URL, manager.state.value.focusedTab.url)
     }
 
     @Test
@@ -42,6 +57,7 @@ class BrowserSessionManagerTest {
         manager.dispatch(BrowserCommand.NewTab(isPrivate = true))
 
         assertTrue(manager.state.value.focusedTab.isPrivate)
+        assertEquals(BrowserSessionManager.HOME_URL, manager.state.value.focusedTab.url)
         assertTrue(manager.restorableTabs().none(BrowserTab::isPrivate))
     }
 
