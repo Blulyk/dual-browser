@@ -8,11 +8,15 @@ import com.blulyk.dualbrowser.DualBrowserApplication
 import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.domain.BrowserSessionManager
 import com.blulyk.dualbrowser.platform.ControllerAction
+import com.blulyk.dualbrowser.data.BookmarkEntity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 class BrowserViewModel(
     private val sessionManager: BrowserSessionManager = BrowserSessionManager(),
     private val engineActionBus: EngineActionBus = EngineActionBus(),
     private val previewStore: TabPreviewStore = TabPreviewStore(),
+    val bookmarks: Flow<List<BookmarkEntity>> = emptyFlow(),
 ) : ViewModel() {
     val state = sessionManager.state
     val engineActions = engineActionBus.actions
@@ -56,6 +60,7 @@ class BrowserViewModel(
                 application.sessionManager,
                 application.engineActionBus,
                 application.tabPreviewStore,
+                application.repository.bookmarks,
             ) as T
         }
     }
