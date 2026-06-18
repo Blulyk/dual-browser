@@ -1,5 +1,6 @@
 package com.blulyk.dualbrowser.engine
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -41,6 +42,7 @@ class WebViewFactory {
         return WebViewBrowserEngine(webView)
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private fun configureSettings(settings: WebSettings) = with(settings) {
         javaScriptEnabled = true
         domStorageEnabled = true

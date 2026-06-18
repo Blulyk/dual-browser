@@ -1,5 +1,6 @@
 package com.blulyk.dualbrowser.platform
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -14,6 +15,7 @@ sealed interface ExternalResult {
 class ExternalIntentHandler(
     private val context: Context,
 ) {
+    @SuppressLint("QueryPermissionsNeeded")
     fun open(uri: Uri): ExternalResult {
         val scheme = uri.scheme?.lowercase().orEmpty()
         if (scheme == "http" || scheme == "https") return ExternalResult.NotExternal
@@ -39,4 +41,3 @@ object PopupPolicy {
     fun decide(userGesture: Boolean): PopupDecision =
         if (userGesture) PopupDecision.OpenNewTab else PopupDecision.Reject
 }
-

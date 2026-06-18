@@ -1,5 +1,7 @@
 package com.blulyk.dualbrowser.ui
 
+import android.content.Intent
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,8 +22,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.blulyk.dualbrowser.domain.BrowserCommand
@@ -32,9 +36,10 @@ import com.blulyk.dualbrowser.domain.BrowserTab
 fun ControlCenter(
     state: BrowserState,
     onCommand: (BrowserCommand) -> Unit,
-    onEngineAction: (EngineAction) -> Unit = {},
     modifier: Modifier = Modifier,
+    onEngineAction: (EngineAction) -> Unit = {},
 ) {
+    val context = LocalContext.current
     var address by rememberSaveable(state.focusedTabId) {
         mutableStateOf(state.focusedTab.url.takeUnless { it == "about:blank" }.orEmpty())
     }
@@ -51,7 +56,9 @@ fun ControlCenter(
             Text("Dual Browser", style = MaterialTheme.typography.titleMedium)
             TabStrip(state = state, onCommand = onCommand)
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 BrowserControl("Back", "back") { onEngineAction(EngineAction.Back) }
@@ -68,6 +75,9 @@ fun ControlCenter(
                             BrowserCommand.ClearLower
                         },
                     )
+                }
+                BrowserControl("Diagnostics", "diagnostics") {
+                    context.startActivity(Intent(context, DiagnosticsActivity::class.java))
                 }
             }
             Row {

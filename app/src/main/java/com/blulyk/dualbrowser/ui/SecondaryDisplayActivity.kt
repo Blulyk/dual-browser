@@ -1,6 +1,7 @@
 package com.blulyk.dualbrowser.ui
 
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -8,8 +9,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.blulyk.dualbrowser.DualBrowserApplication
+import com.blulyk.dualbrowser.platform.ControllerMapper
 
 class SecondaryDisplayActivity : ComponentActivity() {
+    private val controllerMapper = ControllerMapper()
     private val viewModel by viewModels<BrowserViewModel> {
         BrowserViewModel.Factory(application as DualBrowserApplication)
     }
@@ -37,5 +40,12 @@ class SecondaryDisplayActivity : ComponentActivity() {
             }
         }
     }
-}
 
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        controllerMapper.map(keyCode)?.let {
+            viewModel.handleController(it)
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+}

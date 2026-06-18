@@ -2,8 +2,8 @@ package com.blulyk.dualbrowser.platform
 
 import android.app.DownloadManager
 import android.content.Context
-import android.net.Uri
 import android.os.Environment
+import androidx.core.net.toUri
 import java.net.URI
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -21,7 +21,7 @@ class DownloadHandler(
 ) {
     fun enqueue(spec: DownloadSpec): Long {
         val fileName = guessFileName(spec.url, spec.contentDisposition, spec.mimeType)
-        val request = DownloadManager.Request(Uri.parse(spec.url))
+        val request = DownloadManager.Request(spec.url.toUri())
             .setTitle(fileName)
             .setMimeType(spec.mimeType)
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
@@ -55,4 +55,3 @@ class DownloadHandler(
         }
     }
 }
-

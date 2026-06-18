@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.hardware.display.DisplayManager
 import android.view.Display
+import android.os.Build
 import com.blulyk.dualbrowser.ui.SecondaryDisplayActivity
 
 class AndroidDisplayCoordinator(
@@ -26,7 +27,12 @@ class AndroidDisplayCoordinator(
     }
 
     fun launchLowerIfNeeded(assignment: DisplayAssignment): Boolean {
-        val currentDisplayId = activity.display?.displayId ?: Display.DEFAULT_DISPLAY
+        val currentDisplayId = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            activity.display?.displayId ?: Display.DEFAULT_DISPLAY
+        } else {
+            @Suppress("DEPRECATION")
+            activity.windowManager.defaultDisplay.displayId
+        }
         val lowerId = assignment.lowerId ?: return false
         if (!coordinator.shouldLaunchLower(currentDisplayId, assignment)) return false
         return launchLowerActivity(lowerId)

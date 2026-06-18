@@ -50,7 +50,7 @@ $yes = (1..200 | ForEach-Object { "y" }) -join "`n"
 $yes | & $cmdline --sdk_root=$sdkRoot --licenses | Out-Null
 & $cmdline --sdk_root=$sdkRoot "platform-tools" "platforms;android-36" "build-tools;36.0.0"
 
-$sdkProperty = $sdkRoot.Replace("\", "\\")
+$sdkProperty = $sdkRoot.Replace("\", "/").Replace(":", "\:")
 Set-Content -Path "local.properties" -Value "sdk.dir=$sdkProperty" -Encoding Ascii
 
 if (-not (Test-Path "gradlew.bat")) {
