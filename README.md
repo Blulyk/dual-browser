@@ -6,7 +6,7 @@ Navegador Android local y basado en Chromium WebView, diseñado primero para la 
 
 - Web principal en la pantalla superior de la Thor.
 - Centro de control en la pantalla inferior, con modo web secundario opcional.
-- Pestañas normales y privadas, restauración de sesión, historial y favoritos locales.
+- Pestañas normales y privadas que abren Google, barra de búsqueda/URL, restauración de sesión, historial y favoritos locales.
 - Descargas, subida de archivos, vídeo fullscreen, cámara, micrófono y geolocalización.
 - Controles físicos: B vuelve atrás y L1/R1 cambian de pestaña.
 - Sin cuentas, anuncios, telemetría ni servidores.
@@ -28,7 +28,7 @@ adb install -r dual-browser-v0.1.0-beta.1.apk
 Requiere Android Studio con SDK Platform 36, Build-Tools 36.0.0 y JDK 21.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\bootstrap-android.ps1
+. .\scripts\bootstrap-android.ps1
 .\gradlew.bat testDebugUnitTest lintDebug assembleDebug
 ```
 
