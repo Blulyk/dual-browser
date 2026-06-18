@@ -30,6 +30,18 @@ class DisplayCoordinatorTest {
         assertNull(assignment.lowerId)
     }
 
+    @Test
+    fun poweredOffPhysicalDisplayRemainsAssignableAsLower() {
+        val assignment = coordinator.assign(
+            listOf(
+                DisplaySnapshot(id = 0, width = 1920, height = 1080, isPoweredOn = true),
+                DisplaySnapshot(id = 2, width = 1240, height = 1080, isPoweredOn = false),
+            ),
+        )
+
+        assertEquals(2, assignment.lowerId)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun emptyDisplayListIsRejected() {
         coordinator.assign(emptyList())
@@ -41,5 +53,15 @@ class DisplayCoordinatorTest {
 
         assertEquals(true, coordinator.shouldLaunchLower(currentDisplayId = 0, assignment))
         assertEquals(false, coordinator.shouldLaunchLower(currentDisplayId = 2, assignment))
+    }
+
+
+    @Test
+    fun dualModeIsReadyOnlyAfterExpectedLowerDisplayReportsStarted() {
+        val assignment = DisplayAssignment(upperId = 0, lowerId = 2)
+
+        assertEquals(false, coordinator.isDualModeReady(assignment, activeSecondaryDisplayId = null))
+        assertEquals(false, coordinator.isDualModeReady(assignment, activeSecondaryDisplayId = 3))
+        assertEquals(true, coordinator.isDualModeReady(assignment, activeSecondaryDisplayId = 2))
     }
 }

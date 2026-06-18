@@ -14,6 +14,7 @@ import com.blulyk.dualbrowser.DualBrowserApplication
 import com.blulyk.dualbrowser.domain.BrowserCommand
 import com.blulyk.dualbrowser.platform.AndroidDisplayCoordinator
 import com.blulyk.dualbrowser.platform.ControllerMapper
+import com.blulyk.dualbrowser.platform.DisplayAssignment
 
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<BrowserViewModel> {
@@ -21,13 +22,18 @@ class MainActivity : ComponentActivity() {
     }
     private lateinit var displayCoordinator: AndroidDisplayCoordinator
     private val controllerMapper = ControllerMapper()
-    private var dualDisplayActive by mutableStateOf(false)
+    private var displayAssignment by mutableStateOf<DisplayAssignment?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         displayCoordinator = AndroidDisplayCoordinator(this)
         setContent {
             val state by viewModel.state.collectAsStateWithLifecycle()
+            val activeSecondaryDisplayId by (application as DualBrowserApplication)
+                .secondaryDisplayTracker.activeDisplayId.collectAsStateWithLifecycle()
+            val dualDisplayActive = displayAssignment?.let { assignment ->
+                displayCoordinator.isDualModeReady(assignment, activeSecondaryDisplayId)
+            } == true
             MaterialTheme {
                 if (dualDisplayActive) {
                     if (state.focusedTab.needsRecovery) {
@@ -69,7 +75,8 @@ class MainActivity : ComponentActivity() {
     override fun onStart() {
         super.onStart()
         displayCoordinator.start { assignment ->
-            dualDisplayActive = displayCoordinator.launchLowerIfNeeded(assignment)
+            displayAssignment = assignment
+            displayCoordinator.launchLowerIfNeeded(assignment)
         }
     }
 

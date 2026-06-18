@@ -10,6 +10,8 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.blulyk.dualbrowser.DualBrowserApplication
 import com.blulyk.dualbrowser.platform.ControllerMapper
+import android.os.Build
+import android.view.Display
 
 class SecondaryDisplayActivity : ComponentActivity() {
     private val controllerMapper = ControllerMapper()
@@ -39,6 +41,23 @@ class SecondaryDisplayActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        (application as DualBrowserApplication).secondaryDisplayTracker.started(currentDisplayId())
+    }
+
+    override fun onStop() {
+        (application as DualBrowserApplication).secondaryDisplayTracker.stopped(currentDisplayId())
+        super.onStop()
+    }
+
+    private fun currentDisplayId(): Int = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        display?.displayId ?: Display.DEFAULT_DISPLAY
+    } else {
+        @Suppress("DEPRECATION")
+        windowManager.defaultDisplay.displayId
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {

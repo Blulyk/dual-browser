@@ -6,6 +6,7 @@ data class DisplaySnapshot(
     val height: Int,
     val densityDpi: Int = 0,
     val refreshRate: Float = 0f,
+    val isPoweredOn: Boolean = true,
 ) {
     val area: Long = width.toLong() * height.toLong()
 }
