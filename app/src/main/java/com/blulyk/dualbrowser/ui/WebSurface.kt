@@ -1,6 +1,7 @@
 package com.blulyk.dualbrowser.ui
 
 import android.net.Uri
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.PermissionRequest
@@ -17,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +44,9 @@ fun WebSurface(
     onRendererGone: () -> Unit = {},
     onPageFinished: (url: String, title: String) -> Unit = { _, _ -> },
     onPopupRequested: (url: String) -> Unit = {},
+    engineFactory: (Context, WebViewCallbacks) -> WebViewBrowserEngine = { context, callbacks ->
+        WebViewFactory().create(context, callbacks)
+    },
 ) {
     val context = LocalContext.current
     var engine by remember(tab.id) { mutableStateOf<WebViewBrowserEngine?>(null) }
@@ -166,18 +171,20 @@ fun WebSurface(
     }
 
     Box(modifier.fillMaxSize()) {
-        AndroidView(
-            factory = { webContext ->
-                WebViewFactory().create(webContext, callbacks).also {
-                    engine = it
-                    it.load(tab.url)
-                }.view
-            },
-            update = { webView ->
-                if (webView.url != tab.url) webView.loadUrl(tab.url)
-            },
-            modifier = Modifier.fillMaxSize(),
-        )
+        key(tab.id) {
+            AndroidView(
+                factory = { webContext ->
+                    engineFactory(webContext, callbacks).also {
+                        engine = it
+                        it.load(tab.url)
+                    }.view
+                },
+                update = { webView ->
+                    if (webView.url != tab.url) webView.loadUrl(tab.url)
+                },
+                modifier = Modifier.fillMaxSize(),
+            )
+        }
         customView?.let { fullscreenView ->
             AndroidView(
                 factory = {
